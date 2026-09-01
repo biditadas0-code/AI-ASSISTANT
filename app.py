@@ -85,6 +85,9 @@ def chat():
         )
 
         reply = response.choices[0].message.content
+        # Safety check: override if the model claims to be ChatGPT/OpenAI
+        if "chatgpt" in reply.lower() or "openai" in reply.lower():
+            reply = "I'm Pixelmate, a custom chatbot built by Bidita using the Groq API — not ChatGPT!"
 
         # Save conversation to MongoDB
         messages_collection.insert_one({
