@@ -4,6 +4,12 @@ import os
 from dotenv import load_dotenv
 app = Flask(__name__)
 load_dotenv()
+from pymongo import MongoClient
+
+MONGO_URI = os.environ.get("MONGO_URI")
+mongo_client = MongoClient(MONGO_URI)
+db = mongo_client["chatbot_db"]
+messages_collection = db["messages"]
 
 # ---- GROQ API SETUP ----
 
@@ -77,6 +83,12 @@ def chat():
         )
 
         reply = response.choices[0].message.content
+
+        # Save conversation to MongoDB
+        messages_collection.insert_one({
+            "user_message": user_message,
+            "bot_reply": reply
+    })
 
         # Save AI response
         conversation_history.append({
