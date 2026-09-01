@@ -115,10 +115,16 @@
 <div class="chat-container">
   <div class="chat-header">🤖 My AI Assistant</div>
   <div class="chat-messages" id="chatMessages">
-    <div class="message bot">Hi! I can help solve real-life problems or debug your code. What's up?</div>
+    <div class="message bot">Yo 🖐🏻 got a problem or some code acting sus? I gotchu😉</div>
   </div>
   <div class="chat-input">
     <input type="text" id="userInput" placeholder="Type a message or paste code..." />
+    <select id="voiceLang">
+      <option value="en-IN">English</option>
+      <option value="hi-IN">हिंदी</option>
+      <option value="bn-IN">বাংলা</option>
+    </select>
+    <button onclick="startVoice()">🎤</button>
     <button onclick="sendMessage()">Send</button>
   </div>
 </div>
@@ -126,6 +132,15 @@
 <script>
   const messagesDiv = document.getElementById('chatMessages');
   const input = document.getElementById('userInput');
+function startVoice(){
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  const lang = document.getElementById('voiceLang').value;
+  recognition.lang = lang;
+  recognition.onresult = function(event) {
+    document.getElementById('userInput').value = event.results[0][0].transcript;
+  };
+  recognition.start();
+}
 
   input.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') sendMessage();
