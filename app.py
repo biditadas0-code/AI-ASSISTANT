@@ -72,7 +72,7 @@ def chat():
         "role": "user",
         "content": user_message
     })
-    conversation_history = conversation_history[-6:]
+    conversation_history[:] = conversation_history[-6:]
 
     try:
 
