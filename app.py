@@ -78,7 +78,7 @@ def chat():
     try:
 
         response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="llama-3.1-8b-instant",
             messages=conversation_history,
             temperature=0.7,
             max_tokens=2048
