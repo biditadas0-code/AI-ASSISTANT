@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My AI Assistant</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f0f1a;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chat-container {
+    width: 420px;
+    height: 640px;
+    background: #17172b;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+
+  .chat-header {
+    background: linear-gradient(135deg, #6d28d9, #4c1d95);
+    color: white;
+    padding: 18px;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .message {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .user {
+    align-self: flex-end;
+    background: #6d28d9;
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .bot {
+    align-self: flex-start;
+    background: #2a2a45;
+    color: #e5e5e5;
+    border-bottom-left-radius: 4px;
+  }
+
+  .chat-input {
+    display: flex;
+    padding: 12px;
+    background: #12121f;
+    gap: 8px;
+  }
+
+  .chat-input input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #21213a;
+    color: white;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .chat-input button {
+    background: #6d28d9;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .chat-input button:hover {
+    background: #5b21b6;
+  }
+
+  .typing {
+    align-self: flex-start;
+    color: #999;
+    font-size: 13px;
+    font-style: italic;
+    padding: 4px 14px;
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">🤖 My AI Assistant</div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="message bot">Yo 🖐🏻 got a problem or some code acting sus? I gotchu😉</div>
+  </div>
+  <div class="chat-input">
+    <input type="text" id="userInput" placeholder="Type a message or paste code..." />
+    <select id="voiceLang">
+      <option value="en-IN">English</option>
+      <option value="hi-IN">हिंदी</option>
+      <option value="bn-IN">বাংলা</option>
+    </select>
+    <button onclick="startVoice()">🎤</button>
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  const messagesDiv = document.getElementById('chatMessages');
+  const input = document.getElementById('userInput');
+function startVoice(){
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  const lang = document.getElementById('voiceLang').value;
+  recognition.lang = lang;
+  recognition.onresult = function(event) {
+    document.getElementById('userInput').value = event.results[0][0].transcript;
+  };
+  recognition.start();
+}
+
+  input.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  function addMessage(text, sender) {
+    const msg = document.createElement('div');
+    msg.className = 'message ' + sender;
+    msg.textContent = text;
+    messagesDiv.appendChild(msg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    input.value = '';
+
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'typing';
+    typingIndicator.textContent = 'Assistant is typing...';
+    messagesDiv.appendChild(typingIndicator);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await response.json();
+
+      typingIndicator.remove();
+      addMessage(data.reply, 'bot');
+    } catch (err) {
+      typingIndicator.remove();
+      addMessage('Something went wrong connecting to the server.', 'bot');
+    }
+  }
+</script>
+
+</body>
+</html>
