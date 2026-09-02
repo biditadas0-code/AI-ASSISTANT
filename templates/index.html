@@ -149,7 +149,35 @@ function startVoice(){
   function addMessage(text, sender) {
     const msg = document.createElement('div');
     msg.className = 'message ' + sender;
-    if (sender === 'bot') { msg.innerHTML = marked.parse(text, { gfm: true, breaks: true }); } else { msg.textContent = text; }
+    if (sender === 'bot') {
+      msg.innerHTML = marked.parse(text, { gfm: true, breaks: true });
+
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = '📋';
+      copyBtn.className = 'copy-btn';
+      copyBtn.onclick = function() {
+        navigator.clipboard.writeText(text);
+        copyBtn.textContent = '✅';
+        setTimeout(() => { copyBtn.textContent = '📋'; }, 1000);
+      };
+      msg.appendChild(copyBtn);
+
+      const shareBtn = document.createElement('button');
+      shareBtn.textContent = '📤';
+      shareBtn.className = 'share-btn';
+      shareBtn.onclick = function() {
+        if (navigator.share) {
+          navigator.share({ text: text }).catch(() => {});
+        } else {
+          navigator.clipboard.writeText(text);
+          shareBtn.textContent = '✅';
+          setTimeout(() => { shareBtn.textContent = '📤'; }, 1000);
+        }
+      };
+      msg.appendChild(shareBtn);
+    } else {
+      msg.textContent = text;
+    }
     messagesDiv.appendChild(msg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
