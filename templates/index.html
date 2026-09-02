@@ -109,7 +109,7 @@
     padding: 4px 14px;
   }
 </style>
-</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script></head>
 <body>
 
 <div class="chat-container">
@@ -149,7 +149,7 @@ function startVoice(){
   function addMessage(text, sender) {
     const msg = document.createElement('div');
     msg.className = 'message ' + sender;
-    msg.textContent = text;
+    if (sender === 'bot') { msg.innerHTML = marked.parse(text, { gfm: true, breaks: true }); } else { msg.textContent = text; }
     messagesDiv.appendChild(msg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
