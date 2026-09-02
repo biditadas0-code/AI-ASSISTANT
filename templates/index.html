@@ -141,6 +141,13 @@ function startVoice(){
   };
   recognition.start();
 }
+function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      const lang = document.getElementById('voiceLang').value;
+      utterance.lang = lang;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    }
 
   input.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') sendMessage();
@@ -151,6 +158,7 @@ function startVoice(){
     msg.className = 'message ' + sender;
     if (sender === 'bot') {
       msg.innerHTML = marked.parse(text, { gfm: true, breaks: true });
+      speak(text);
 
       const copyBtn = document.createElement('button');
       copyBtn.textContent = '📋';
